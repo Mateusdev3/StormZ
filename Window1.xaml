@@ -37,6 +37,14 @@
     </Window.Resources>
 
     <Grid MouseDown="Mouse">
+
+        <Button Content="X" Margin="319,7,0,143"
+                Click="CloseWindow"
+                Style="{StaticResource RedNeonButton}"  
+                Panel.ZIndex="1"
+                
+                
+     HorizontalAlignment="Left" Width="31" />
         <!-- Vidro escuro com brilho vermelho -->
         <Border CornerRadius="12" Background="#AA000000" BorderBrush="#55FF5555" BorderThickness="1" Padding="15">
             <Border.Effect>
@@ -55,13 +63,15 @@
                          Background="Black"/>
 
 
-       
+
 
                 <Button Content="Confirmar" Margin="0,15,0,0"
                         Click="Confirmar"
                         Style="{StaticResource RedNeonButton}"
                         HorizontalAlignment="Center" />
-               
+
+
+
             </StackPanel>
         </Border>
     </Grid>

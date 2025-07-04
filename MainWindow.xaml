@@ -52,7 +52,7 @@
         </Grid.Background>
 
         <!-- TOPO -->
-        <Border Height="65" VerticalAlignment="Top" CornerRadius="10" Margin="10" Background="#AA0A0A0A">
+        <Border Height="65" VerticalAlignment="Top" CornerRadius="10" Margin="0,10,0,0" Background="#AA0A0A0A">
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,10,0">
                 <TextBlock x:Name="txtnick"
                            FontSize="24" FontWeight="Bold" FontStyle="Italic"
@@ -73,6 +73,16 @@
             <Border.Effect>
                 <DropShadowEffect Color="#FFFF4444" BlurRadius="60" ShadowDepth="0"/>
             </Border.Effect>
+            <Button
+            Style="{StaticResource NeonButton}" Margin="6,-412,826,482" Click="Abrirconfig">
+                <StackPanel
+            HorizontalAlignment="Center" Orientation="Horizontal">
+                    <Image
+            Width="28" Source="Assets\IconOptions.png" Margin="0,0,5,0" Height="28"/>
+                    <TextBlock
+            Text="Config" VerticalAlignment="Center"/>
+                </StackPanel>
+            </Button>
         </Border>
 
         <!-- BOTÃO JOGAR no canto inferior direito -->
@@ -84,22 +94,16 @@
                 Margin="0,0,20,30"/>
 
         <!-- BOTÃO ATUALIZAR no canto inferior esquerdo -->
-        <Button Content="Atualizar"
-                Click="btnBaixar_Click"
-                Style="{StaticResource NeonButton}"
-                HorizontalAlignment="Left"
-                VerticalAlignment="Bottom"
-                Margin="20,0,0,30"/>
 
         <!-- BOTÃO DISCORD centralizado -->
         <Button Click="Abrirdc"
                 Style="{StaticResource NeonButton}"
                 HorizontalAlignment="Center"
-                VerticalAlignment="Bottom"
-                Margin="0,0,0,30">
+                VerticalAlignment="Top"
+                Margin="0,470,0,0">
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                 <Image Source="Assets\IconDiscord.png" Width="28" Height="28" Margin="0,0,5,0"/>
-                <TextBlock Text="Discord" VerticalAlignment="Center"/>
+                <TextBlock VerticalAlignment="Center"/>
             </StackPanel>
         </Button>
 
@@ -107,19 +111,9 @@
         <StackPanel Orientation="Vertical"
                     HorizontalAlignment="Left"
                     VerticalAlignment="Top"
-                    Margin="20,80,0,0">
-            <Button Click="Abrirconfig"
-                    Style="{StaticResource NeonButton}"
-                    Margin="0,0,0,10">
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                    <Image Source="Assets\IconOptions.png" Width="28" Height="28" Margin="0,0,5,0"/>
-                    <TextBlock Text="Config" VerticalAlignment="Center"/>
-                </StackPanel>
-            </Button>
-
-            <Button Content="Nickname"
+                    Margin="20,80,0,0"/>
+        <Button Content="Nickname"
                     Click="AbrirJanelaNome_Click"
-                    Style="{StaticResource NeonButton}"/>
-        </StackPanel>
+                    Style="{StaticResource NeonButton}" Margin="20,470,812,30"/>
     </Grid>
 </Window>
