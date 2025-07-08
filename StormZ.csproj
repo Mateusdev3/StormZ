@@ -7,13 +7,19 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
 	<UseWindowsForms>true</UseWindowsForms>
+	<ApplicationIcon>Assets\icone.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
     <None Remove="Assets\fundo.png" />
     <None Remove="Assets\IconDiscord.png" />
     <None Remove="Assets\IconOptions.png" />
-    <None Remove="nick.txt" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Assets\icone.ico">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
   <ItemGroup>
@@ -30,9 +36,6 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
     <Resource Include="Assets\IconOptions.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Resource>
-    <Resource Include="nick.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
   </ItemGroup>
