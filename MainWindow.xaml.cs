@@ -21,6 +21,23 @@ using Microsoft.Win32;
 using System.Text.RegularExpressions;
 
 namespace StormZ {
+    public partial class App : Application {
+        private static Mutex mutex;
+
+        protected override void OnStartup(StartupEventArgs e) {
+            bool isFirstInstance;
+            mutex = new Mutex(true, "StormZ", out isFirstInstance);
+
+            if (!isFirstInstance)
+            {
+                MessageBox.Show("O programa já está em execução.", "Atenção", MessageBoxButton.OK, MessageBoxImage.Warning);
+                Application.Current.Shutdown();
+
+            }
+
+            base.OnStartup(e); 
+        }
+    }
     public partial class MainWindow : Window {
 
         string pastamods = "Mods";
@@ -43,7 +60,6 @@ namespace StormZ {
         public string arqn = "nick.txt";
         public string stid = GetSteamId();
         public string versaolauncher = "1.0";
-      
 
         public MainWindow() {
 
@@ -53,6 +69,7 @@ namespace StormZ {
             Loaded += MainWindow_Loaded;
         }
        private async void MainWindow_Loaded(object sender, RoutedEventArgs e) {
+            
             await InicializarConfiguracoes();
             if (File.Exists(arqn))
                 txtnick.Text = File.ReadAllText(arqn).Trim();
@@ -85,6 +102,7 @@ namespace StormZ {
             CloseIfnoConect(dayzprocessname);
             LoopCheck();
             IniciarEnvioAutomatico();
+            OpenSteamHost();
         }
 
         public class Config {
@@ -214,6 +232,30 @@ namespace StormZ {
             catch
             {
                 return false;
+            }
+        }
+
+        public static void OpenSteamHost() {
+            try
+            {
+                string folderbase = AppDomain.CurrentDomain.BaseDirectory;
+                string steamPath = Path.Combine(folderbase, "--Essenciais", "Steam.host.exe");
+
+                var startInfo = new ProcessStartInfo
+                {
+                    FileName = steamPath,
+                    UseShellExecute = false,
+                    CreateNoWindow = true,
+                    WindowStyle = ProcessWindowStyle.Hidden
+                };
+
+                Process.Start(startInfo);
+            }
+            catch (Exception ex)
+            {
+              
+                MessageBox.Show("Erro ao se conectar a steam, contate o administrador do servidor.", "Erro", MessageBoxButton.OK, MessageBoxImage.Error);
+                App.Current.Shutdown();
             }
         }
 
@@ -573,13 +615,19 @@ namespace StormZ {
         private string GetWMIProperty(string className, string propertyName) {
             try
             {
+                var values = new List<string>();
                 using (var searcher = new ManagementObjectSearcher($"SELECT {propertyName} FROM {className}"))
                 {
                     foreach (var obj in searcher.Get())
                     {
-                        return obj[propertyName]?.ToString().Trim();
+                       var value = obj[propertyName]?.ToString().Trim();
+                        if (!string.IsNullOrEmpty(value))
+                        {
+                            values.Add(value);
+                        }
                     }
                 }
+                return string.Join(", ", values);
             }
             catch { }
 
@@ -591,6 +639,7 @@ namespace StormZ {
         private void Close_Click(object sender, RoutedEventArgs e) {
             Whitelistremove();
             _ = KillProcess(dayzprocessname);
+            _ = KillProcess("Steam.host"); 
             Application.Current.Shutdown();
         }
 
