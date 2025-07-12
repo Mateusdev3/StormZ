@@ -8,12 +8,14 @@
     <UseWPF>true</UseWPF>
 	<UseWindowsForms>true</UseWindowsForms>
 	<ApplicationIcon>Assets\icone.ico</ApplicationIcon>
+	<ApplicationManifest>Properties\app.manifest</ApplicationManifest>
   </PropertyGroup>
 
   <ItemGroup>
     <None Remove="Assets\fundo.png" />
     <None Remove="Assets\IconDiscord.png" />
     <None Remove="Assets\IconOptions.png" />
+    <None Remove="Assets\install.png" />
   </ItemGroup>
 
   <ItemGroup>
@@ -36,6 +38,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
     <Resource Include="Assets\IconOptions.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Assets\install.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
   </ItemGroup>

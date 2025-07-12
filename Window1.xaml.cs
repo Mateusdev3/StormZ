@@ -10,8 +10,6 @@ namespace StormZ {
         public Window1(string Nickname) {
             InitializeComponent();
             nickrecebido = Nickname;
-
-
         }
 
         private void Confirmar(object sender, RoutedEventArgs e) {

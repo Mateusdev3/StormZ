@@ -9,7 +9,7 @@
         Height="550" Width="1000"
         WindowStyle="None" AllowsTransparency="True" Background="Transparent">
 
-    <!-- 🌟 ESTILOS -->
+    <!-- ESTILOS -->
     <Window.Resources>
         <Style x:Key="NeonButton" TargetType="Button">
             <Setter Property="Foreground" Value="White"/>
@@ -78,9 +78,9 @@
                 <StackPanel
             HorizontalAlignment="Center" Orientation="Horizontal">
                     <Image
-            Width="28" Source="Assets\IconOptions.png" Margin="0,0,5,0" Height="28"/>
+            Width="28" Source="Assets\install.png" Margin="0,0,5,0" Height="28"/>
                     <TextBlock
-            Text="Config" VerticalAlignment="Center"/>
+            Text="" VerticalAlignment="Center"/>
                 </StackPanel>
             </Button>
         </Border>

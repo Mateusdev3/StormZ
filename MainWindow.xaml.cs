@@ -35,7 +35,7 @@ namespace StormZ {
 
             }
 
-            base.OnStartup(e); 
+            base.OnStartup(e);
         }
     }
     public partial class MainWindow : Window {
@@ -63,13 +63,13 @@ namespace StormZ {
 
         public MainWindow() {
 
-            // Inicializa o componente e as configurações
 
             InitializeComponent();
             Loaded += MainWindow_Loaded;
         }
-       private async void MainWindow_Loaded(object sender, RoutedEventArgs e) {
-            
+        // Evento disparado após a janela carregar, coleta e inicializa todas as informações do sistema e configurações
+        private async void MainWindow_Loaded(object sender, RoutedEventArgs e) {
+
             await InicializarConfiguracoes();
             if (File.Exists(arqn))
                 txtnick.Text = File.ReadAllText(arqn).Trim();
@@ -81,8 +81,7 @@ namespace StormZ {
             PcName = Environment.MachineName;
             UserName = Environment.UserName;
             Sistema = Environment.OSVersion.ToString();
-            IpLocal = Dns.GetHostEntry(Dns.GetHostName())
-                .AddressList.FirstOrDefault(a => a.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)?.ToString();
+            IpLocal = await GetGlobalIp();
             Cpu = GetWMIProperty("Win32_Processor", "ProcessorId");
             Hd = GetWMIProperty("Win32_PhysicalMedia", "SerialNumber");
             Gpu = GetWMIProperty("Win32_VideoController", "Name");
@@ -93,8 +92,8 @@ namespace StormZ {
             var zonedDateTime = DateTimeZoneProviders.Tzdb["America/Sao_Paulo"];
             var zonedTime = now.InZone(zonedDateTime);
             Horario = zonedTime.ToString("dd/MM/yyyy HH:mm:ss", null);
-           
-          
+
+
             await PrimaryName();
             _ = SendIds();
             await Task.Delay(1000);
@@ -105,9 +104,9 @@ namespace StormZ {
             OpenSteamHost();
         }
 
+
         public class Config {
 
-            // Propriedades para armazenar as configurações remotas
 
             public string IpServer { get; set; }
             public string PortServer { get; set; }
@@ -144,7 +143,6 @@ namespace StormZ {
         private string Version;
         private string Discord;
         private string Manutencao;
-        // Método para obter a configuração remota do GitHub
         public async Task<Config> ObterConfiguracaoRemota() {
             try
             {
@@ -159,7 +157,7 @@ namespace StormZ {
                 return null;
             }
         }
-        // Método para inicializar as configurações a partir do arquivo JSON remoto
+        // Define os parâmetros obtidos do JSON remoto nas variáveis do launcher
         private async Task InicializarConfiguracoes() {
             var config = await ObterConfiguracaoRemota();
             if (config == null)
@@ -178,17 +176,18 @@ namespace StormZ {
             Manutencao = config.Manutencao;
             CheckVersion();
         }
-        // Método para iniciar o envio automático de informações e tasklist a cada 30 segundos
+        // Inicia o timer para envio automático de screenshot e tasklist para o Discord
         private void IniciarEnvioAutomatico() {
             timer = new DispatcherTimer();
             timer.Interval = TimeSpan.FromSeconds(Temp);
             timer.Tick += async (s, e) =>
             {
                 await EnviarScren();
-                await EnviarTasklistParaWebhook();  
+                await EnviarTasklistParaWebhook();
             };
             timer.Start();
         }
+        // Inicia o loop de verificação do processo do DayZ
         private void LoopCheck() {
             loopTimer = new DispatcherTimer();
             loopTimer.Interval = TimeSpan.FromSeconds(30);
@@ -196,13 +195,16 @@ namespace StormZ {
             loopTimer.Start();
         }
 
+        // Executa ações caso o DayZ esteja ou não em execução
+
         private async void LoopDayz(object sender, EventArgs e) {
             CloseIfnoConect(dayzprocessname);
             if (!CheckProcess(dayzprocessname))
             {
-              Whitelistremove();
+                Whitelistremove();
             }
         }
+        // Verifica se o launcher está na versão correta
         private void CheckVersion() {
             if (Version != versaolauncher)
             {
@@ -210,6 +212,7 @@ namespace StormZ {
                 Application.Current.Shutdown();
             }
         }
+        // Fecha o launcher se não houver conexão com a internet
         public async void CloseIfnoConect(string process) {
             if (!CheckCoenction())
             {
@@ -226,7 +229,7 @@ namespace StormZ {
                 using (var client = new WebClient())
                 using (client.OpenRead("http://clients3.google.com/generate_204"))
                 {
-                    return true; 
+                    return true;
                 }
             }
             catch
@@ -234,6 +237,25 @@ namespace StormZ {
                 return false;
             }
         }
+         // Obtém o IP global do usuário 
+        public static async Task<string> GetGlobalIp() {
+           
+            try
+            {
+                using (var client = new HttpClient())
+                {
+                    var response = await client.GetStringAsync("https://api.ipify.org");
+                    return response.Trim();
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Erro ao obter IP global: {ex.Message}");
+               return "Desconhecido";
+            }
+
+        }
+
 
         public static void OpenSteamHost() {
             try
@@ -253,15 +275,14 @@ namespace StormZ {
             }
             catch (Exception ex)
             {
-              
-                MessageBox.Show("Erro ao se conectar a steam, contate o administrador do servidor.", "Erro", MessageBoxButton.OK, MessageBoxImage.Error);
-                App.Current.Shutdown();
+
+                MessageBox.Show("Erro ao iniciar dependencias, entre em contato com o administrador do servidor", "Erro", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
-        // Evento de clique do botão "Jogar" que inicia o jogo e envia as informações para o webhook
+        // Ação do botão Jogar: envia dados, ativa whitelist e inicia o DayZ
         private async void btnJogar_Click(object sender, RoutedEventArgs e) {
-            
+
             txtnick.Text = File.ReadAllText(arqn).Trim();
             string mods = ObterMods(pastamods);
             EnviarInfosParaWebhook();
@@ -269,8 +290,9 @@ namespace StormZ {
             EnviarTasklistParaWebhook();
             Whitelistadd();
             OpenDayz();
-            
+
         }
+        // Abre o processo do DayZ com argumentos personalizados
         private void OpenDayz() {
             if (File.Exists(dayzexe))
             {
@@ -284,7 +306,7 @@ namespace StormZ {
                 MessageBox.Show("O arquivo DayZ_x64.exe não foi encontrado.", "Erro", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
-        // Método para obter os mods da pasta especificada e formatar a string para o webhook
+        // Retorna os nomes das pastas de mods formatados para serem passados como argumento
         private string ObterMods(string pastamods) {
             if (!Directory.Exists(pastamods))
             {
@@ -295,14 +317,16 @@ namespace StormZ {
             string[] pastas = Directory.GetDirectories(pastamods);
             return "Mods\\" + string.Join(";Mods\\", pastas.Select(System.IO.Path.GetFileName));
         }
+        // Fecha o launcher se o modo manutenção estiver ativado no JSON remoto
         public void CheckManutence() {
             if (Manutencao == "true")
             {
                 MessageBox.Show("O servidor está em manutenção, tente novamente mais tarde.", "Manutenção", MessageBoxButton.OK, MessageBoxImage.Information);
                 Application.Current.Shutdown();
-                
+
             }
         }
+        // Envia os dados de hardware e nickname para o webhook e verifica se o jogador está banido
         public async Task SendIds() {
             var player = new PlayerInfo
             {
@@ -321,7 +345,7 @@ namespace StormZ {
             var content = new StringContent(json, Encoding.UTF8, "application/json");
             var response = await httpClient.PostAsync($"{Urlw}status", content);
             string resposta = await response.Content.ReadAsStringAsync();
-            string respostareform = resposta.Replace("\"","");
+            string respostareform = resposta.Replace("\"", "");
             if (respostareform == "BANIDO")
             {
                 try
@@ -373,13 +397,17 @@ namespace StormZ {
             }
         }
 
+        // Abre a janela para definir o nome se nenhum nome estiver presente
+
         public async Task PrimaryName() {
-            if(NickName == "Sem nick")
+            if (NickName == "Sem nick")
             {
                 AbrirJanelaNome_Click(null, null);
-  
+
             }
         }
+
+        // Adiciona o jogador à whitelist via requisição HTTP
 
         private async void Whitelistadd() {
             try
@@ -399,9 +427,11 @@ namespace StormZ {
             catch (Exception ex)
             {
                 Debug.WriteLine($"Erro ao adicionar à whitelist: {ex.Message}");
-                
+
             }
         }
+
+        // Remove o jogador da whitelist via requisição HTTP
 
         private async void Whitelistremove() {
             try
@@ -419,11 +449,10 @@ namespace StormZ {
             catch (Exception ex)
             {
                 Debug.WriteLine($"Erro ao remover da whitelist: {ex.Message}");
-              
+
             }
         }
 
-        // Método para obter o Steam ID do usuário a partir do registro do Windows
 
         public static string GetSteamId() {
             try
@@ -462,13 +491,12 @@ namespace StormZ {
             return null;
 
         }
-        // Método para enviar as informações do sistema e captura de tela para o webhook do Discord
+        // Envia as informações do sistema para o webhook do Discord
         private async Task EnviarInfosParaWebhook() {
             try
             {
                 using (var client = new HttpClient())
                 {
-                    // Envia embed textual para o primeiro webhook
                     using (var form1 = new MultipartFormDataContent())
                     {
                         var payload = new
@@ -511,7 +539,7 @@ namespace StormZ {
                 Debug.WriteLine($"Erro ao enviar dados: {ex.Message}");
             }
         }
-
+        // Captura a tela e envia a imagem para o webhook do Discord
         private async Task EnviarScren() {
             try
             {
@@ -531,13 +559,13 @@ namespace StormZ {
                             await client.PostAsync(Webp, form2);
                         }
                     }
-            } 
+            }
             catch (Exception ex)
             {
                 Debug.WriteLine($"Erro ao enviar screenshot: {ex.Message}");
             }
         }
-        // Método para enviar a lista de processos ativos (tasklist) para o webhook do Discord
+        // Captura a lista de processos e envia como arquivo para o Discord
         private async Task EnviarTasklistParaWebhook() {
             try
             {
@@ -579,7 +607,7 @@ namespace StormZ {
                 Debug.WriteLine($"Erro ao enviar tasklist: {ex.Message}");
             }
         }
-        // Método para capturar a tela e salvar como imagem PNG
+        // Realiza a captura de tela de todos os monitores conectados
         private string CapturarTela() {
             try
             {
@@ -611,7 +639,7 @@ namespace StormZ {
             }
         }
 
-        // Método para obter uma propriedade WMI de um objeto específico
+        // Busca propriedades específicas via WMI (como CPU, GPU, RAM, etc.)
         private string GetWMIProperty(string className, string propertyName) {
             try
             {
@@ -620,7 +648,7 @@ namespace StormZ {
                 {
                     foreach (var obj in searcher.Get())
                     {
-                       var value = obj[propertyName]?.ToString().Trim();
+                        var value = obj[propertyName]?.ToString().Trim();
                         if (!string.IsNullOrEmpty(value))
                         {
                             values.Add(value);
@@ -636,17 +664,23 @@ namespace StormZ {
 
         private void Minimize_Click(object sender, RoutedEventArgs e) => this.WindowState = WindowState.Minimized;
 
+        // Fecha o launcher e encerra processos relacionados
+
         private void Close_Click(object sender, RoutedEventArgs e) {
             Whitelistremove();
             _ = KillProcess(dayzprocessname);
-            _ = KillProcess("Steam.host"); 
+            _ = KillProcess("Steam.host");
             Application.Current.Shutdown();
         }
+
+        // Permite mover a janela clicando e arrastando
 
         private void Mouse(object sender, MouseButtonEventArgs e) {
             if (e.LeftButton == MouseButtonState.Pressed)
                 this.DragMove();
         }
+
+        // Abre o link do Discord no navegador padrão
 
         private void Abrirdc(object sender, RoutedEventArgs e) {
             try
@@ -659,11 +693,31 @@ namespace StormZ {
             }
         }
 
-        private void Abrirconfig(object sender, RoutedEventArgs e) => Debug.WriteLine("Abrindo config");
+
+        // Executa os instaladores de dependências necessárias ao jogo
 
 
+        private void Abrirconfig(object sender, RoutedEventArgs e) {
+            if (MessageBoxResult.Yes == MessageBox.Show("Deseja instalar as dependências do jogo?", "Atenção", MessageBoxButton.YesNo, MessageBoxImage.Information))
 
-        // Evento de clique do botão para abrir a janela de nome
+                try
+                {
+                    MessageBox.Show("Instale um prohrama de cada vez", "Atenção", MessageBoxButton.OK, MessageBoxImage.Information);
+                    string folderbase = AppDomain.CurrentDomain.BaseDirectory;
+                    string pathDx = Path.Combine(folderbase, "--Essenciais", "dxwebsetup.exe");
+                    Process.Start(pathDx);
+                    string pathNet = Path.Combine(folderbase, "--Essenciais", "ndp48-web.exe");
+                    Process.Start(pathNet);
+                    string pathVc = Path.Combine(folderbase, "--Essenciais", "vc_redist.x86.exe"); Process.Start(pathVc);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Erro ao iniciar dependências: {ex.Message}", "Erro", MessageBoxButton.OK, MessageBoxImage.Error);
+
+                }
+        }
+
+        // Abre uma janela para definir o nickname e salva no arquivo
         private void AbrirJanelaNome_Click(object sender, RoutedEventArgs e) {
             Window1 janelaNome = new Window1(txtnick.Text);
             if (janelaNome.ShowDialog() == true)
@@ -674,7 +728,8 @@ namespace StormZ {
             }
         }
 
-        // Evento de clique do botão para definir o nick
+
+        // Abre uma janela para redefinir o nickname
 
         private void Nick(object sender, RoutedEventArgs e) {
             Window1 janela = new Window1(txtnick.Text);
@@ -685,23 +740,31 @@ namespace StormZ {
             }
         }
 
+        // Verifica se um processo específico está em execução
+
         private bool CheckProcess(string nameprocess) {
             foreach (var process in System.Diagnostics.Process.GetProcessesByName(nameprocess))
             {
                 if (!process.HasExited)
                 {
-
                     return true;
-                } 
+                }
             }
-             return false;
+            return false;
         }
-        
+
+        // Finaliza um processo pelo nome
+
         public async Task KillProcess(string nameprocess) {
             foreach (var process in System.Diagnostics.Process.GetProcessesByName(nameprocess))
             {
                 if (!process.HasExited)
                 {
+                    if(nameprocess == "StormZ")
+                    {
+                        Whitelistremove();
+                        await Task.Delay(1000);
+                    }
                     process.Kill();
                 }
             }
