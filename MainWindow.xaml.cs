@@ -19,6 +19,7 @@ using Application = System.Windows.Application;
 using System.Diagnostics;
 using Microsoft.Win32;
 using System.Text.RegularExpressions;
+using DiscordRPC;
 
 namespace StormZ {
     public partial class App : Application {
@@ -66,6 +67,8 @@ namespace StormZ {
 
             InitializeComponent();
             Loaded += MainWindow_Loaded;
+            RPC.rpctimestamp = Timestamps.Now;
+           
         }
         // Evento disparado após a janela carregar, coleta e inicializa todas as informações do sistema e configurações
         private async void MainWindow_Loaded(object sender, RoutedEventArgs e) {
@@ -102,6 +105,8 @@ namespace StormZ {
             LoopCheck();
             IniciarEnvioAutomatico();
             OpenSteamHost();
+            RPC.InitializeRPC(NickName, Discord, Map);
+
         }
 
 
@@ -119,6 +124,7 @@ namespace StormZ {
             public int Temp { get; set; }
             public string Version { get; set; }
             public string Discord { get; set; }
+            public string Map { get; set; }
             public string Manutencao { get; set; }
         }
         public class PlayerInfo {
@@ -142,6 +148,7 @@ namespace StormZ {
         private int Temp;
         private string Version;
         private string Discord;
+        private string Map;
         private string Manutencao;
         public async Task<Config> ObterConfiguracaoRemota() {
             try
@@ -173,6 +180,7 @@ namespace StormZ {
             Temp = config.Temp;
             Version = config.Version;
             Discord = config.Discord;
+            Map = config.Map;
             Manutencao = config.Manutencao;
             CheckVersion();
         }
