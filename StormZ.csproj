@@ -12,6 +12,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Assets\fundo.mp4" />
     <None Remove="Assets\fundo.png" />
     <None Remove="Assets\IconDiscord.png" />
     <None Remove="Assets\IconOptions.png" />
@@ -32,6 +33,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="Assets\fundo.mp4">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Resource Include="Assets\fundo.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>

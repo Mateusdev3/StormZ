@@ -285,7 +285,13 @@ namespace StormZ {
             {
 
                 MessageBox.Show("Erro ao iniciar dependencias, entre em contato com o administrador do servidor", "Erro", MessageBoxButton.OK, MessageBoxImage.Error);
+                Application.Current.Shutdown();
             }
+        }
+
+        private void VideoFundo_MediaEnded(object sender, RoutedEventArgs e) {
+            VideoFundo.Position = TimeSpan.Zero;
+            VideoFundo.Play(); 
         }
 
         // Ação do botão Jogar: envia dados, ativa whitelist e inicia o DayZ
@@ -706,11 +712,11 @@ namespace StormZ {
 
 
         private void Abrirconfig(object sender, RoutedEventArgs e) {
-            if (MessageBoxResult.Yes == MessageBox.Show("Deseja instalar as dependências do jogo?", "Atenção", MessageBoxButton.YesNo, MessageBoxImage.Information))
+            if (MessageBoxResult.Yes == MessageBox.Show("Deseja instalar as dependências do Dayz?", "Atenção", MessageBoxButton.YesNo, MessageBoxImage.Information))
 
                 try
                 {
-                    MessageBox.Show("Instale um prohrama de cada vez", "Atenção", MessageBoxButton.OK, MessageBoxImage.Information);
+                    MessageBox.Show("Instale um programa de cada vez!!!", "Atenção", MessageBoxButton.OK, MessageBoxImage.Information);
                     string folderbase = AppDomain.CurrentDomain.BaseDirectory;
                     string pathDx = Path.Combine(folderbase, "--Essenciais", "dxwebsetup.exe");
                     Process.Start(pathDx);
